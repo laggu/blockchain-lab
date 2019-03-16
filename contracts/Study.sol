@@ -16,6 +16,7 @@ contract Study {
   bytes32 labName;
   mapping(address => Student) public students;
   Lecture[] class;
+  bytes32 attendanceCode;
 
   constructor(bytes32 className, bytes32[] memory lectureNames) public {
     labAdmin = msg.sender;
@@ -52,7 +53,15 @@ contract Study {
       lectureList[i] = class[i].lectureName;
     }
   }
-  function setAttendance(uint lectureNum) public {
+  // function setAttendance(uint lectureNum) public {
+  //   class[lectureNum].attandee.push(msg.sender);
+  // }
+  function setAttendanceCode(uint _attendanceCode) onlyAdmin public {
+    attendanceCode = sha3(_attendanceCode);
+  }
+
+  function setAttendance(uint lectureNum, uint _attendanceCode) public {
+    require(attendanceCode == sha3(_attendanceCode));
     class[lectureNum].attandee.push(msg.sender);
   }
 
