@@ -17,10 +17,19 @@ contract Study {
   mapping(address => Student) public students;
   Lecture[] class;
   bytes32 attendanceCode;
+  uint deposit;
 
-  constructor(bytes32 className, bytes32[] memory lectureNames) public {
+  modifier onlyAdmin {
+    require(msg.sender == labAdmin);
+    _;
+  }
+
+
+  constructor(bytes32 className, bytes32[] memory lectureNames, uint _deposit) public {
     labAdmin = msg.sender;
     labName = className;
+    deposit = _deposit;
+
     for(uint i=0; i<lectureNames.length; i++) {
       class.push(Lecture({
         lectureName: lectureNames[i],
@@ -29,8 +38,7 @@ contract Study {
     }
   }
 
-  function kill() public{
-    require(msg.sender == labAdmin);
+  function kill() onlyAdmin public{
     selfdestruct(msg.sender);
   }
 
@@ -68,4 +76,10 @@ contract Study {
   function getAttendance(uint lectureNum) public view returns (address[] memory){
     return class[lectureNum].attandee;
   }
+
+  function join(bytes32 name, bytes32 email) payable public {
+    require(deposit <= msg.value);
+    students[msg.sender] = Student(name, email);
+  }
+
 }
